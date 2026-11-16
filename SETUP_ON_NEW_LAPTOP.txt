@@ -1,0 +1,42 @@
+CodeGuard AI - running on a new laptop
+=======================================
+
+1. Install Python 3.13 (64-bit) from python.org. Tick "Add python.exe to PATH".
+
+2. Unzip this folder, open a terminal inside it, and install the packages
+   (needs internet; takes a while because PyTorch is large):
+
+       python -m pip install -r requirements.txt
+
+3. Start the app:
+
+       python -m streamlit run app/Home.py
+
+   It opens at http://localhost:8501.
+
+   The knowledge base and the trained model are already included, so scanning works
+   straight away. The first AI explanation or knowledge-base search downloads the
+   small embedding model (about 90 MB) once, so keep the internet on the first time.
+
+4. Optional, for AI explanations: install Ollama from https://ollama.com, then run
+
+       ollama pull llama3.2
+
+   Without Ollama the app still scans and shows the trusted sources, just without
+   the AI-written explanation.
+
+5. Optional, for the demo zips used on the Repository Scan page:
+
+       python scripts/make_demo_zips.py
+
+   (They are already included in codeguard_data/demo/.)
+
+6. Optional, run the tests (about 1-2 minutes):
+
+       python -m pytest -q
+
+Not included (too large, only needed to re-train the models in experiments/):
+  datasets/raw and datasets/processed. See Documents/Datasets_Guide.docx to rebuild them.
+
+All project documents are in the Documents/ folder; the research paper is in
+CodeGuard-AI-Research-Paper/.

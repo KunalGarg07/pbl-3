@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+
+# Data (rebuilt by scripts/)
+datasets/raw/*
+datasets/processed/*
+!datasets/raw/.gitkeep
+!datasets/processed/.gitkeep
+
+# Generated artifacts (rebuilt by experiments/). The small scanner model (v2) is committed so the app
+# works right after cloning; the Devign model and archived v1 model are not.
+artifacts/model/devign_c_model.joblib
+artifacts/model/v1/*.joblib
+codeguard_data/
+knowledge_base/index/
+knowledge_base/docs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated reports (scripts/run_eval.py, scripts/make_explanation_sheet.py); Word copies live in Documents/
+reports/
+
+# Word lock files and local tool settings
+~$*
+.claude/

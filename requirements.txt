@@ -1,0 +1,34 @@
+# Core data + ML (Phase 1)
+pandas==2.2.3
+numpy==2.1.3
+scikit-learn==1.6.1
+xgboost==3.4.1
+joblib==1.4.2
+pyarrow==19.0.0
+matplotlib==3.10.0
+seaborn==0.13.2
+requests==2.34.2
+
+# Experiments
+jupyter==1.1.1
+nbconvert==7.16.6
+nbformat==5.10.4
+
+# Scanner + app (Phase 2)
+bandit==1.8.6
+pydantic==2.10.3
+streamlit==1.45.1
+PyYAML==6.0.2
+
+# RAG + explanations (Phase 3)
+sentence-transformers==6.0.1
+# The local language model runs in Ollama (https://ollama.com): `ollama pull llama3.2`
+# Optional hosted model:
+anthropic==0.112.0
+
+# CodeBERT experiment (experiment 06, CPU build of PyTorch)
+torch==2.14.0
+transformers==5.17.0
+
+# Testing
+pytest==8.3.4
