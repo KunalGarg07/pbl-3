@@ -1,0 +1,43 @@
+{
+  "queries": 175,
+  "by_source": {
+    "fixture": 12,
+    "cvefixes": 163
+  },
+  "summary": [
+    {
+      "setting": "Semantic only",
+      "hit@1": 0.263,
+      "hit@3": 0.32,
+      "hit@4": 0.349,
+      "MRR": 0.29,
+      "guidance@4": 0.023
+    },
+    {
+      "setting": "+ CWE boost",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@4": 1.0,
+      "MRR": 1.0,
+      "guidance@4": 0.92
+    },
+    {
+      "setting": "+ CWE and rule boost",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@4": 1.0,
+      "MRR": 1.0,
+      "guidance@4": 0.269
+    },
+    {
+      "setting": "+ boosts, diverse slots (used)",
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@4": 1.0,
+      "MRR": 1.0,
+      "guidance@4": 0.943
+    }
+  ],
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "chunks": 3320
+}

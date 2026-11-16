@@ -1,0 +1,89 @@
+{
+  "model_version": "py-tfidf-logistic-20261015",
+  "language": "python",
+  "algorithm": "Logistic Regression",
+  "features": "TF-IDF on Python identifier and symbol tokens, 1-2 grams, 20k max features",
+  "training_data": "CVEfixes Python methods (before fix = 1, after fix = 0), cleaned in experiment 04",
+  "split": "GroupShuffleSplit by repository 80/20 (seed 42); model chosen by 5-fold GroupKFold PR-AUC",
+  "train_size": 5169,
+  "test_size": 1458,
+  "threshold": 0.311,
+  "threshold_method": "max F1 on out-of-fold training predictions",
+  "cross_validation": [
+    {
+      "Model": "Baseline (majority)",
+      "accuracy": 0.647,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "pr_auc": 0.353,
+      "F1 std": 0.0,
+      "Seconds": 29.808
+    },
+    {
+      "Model": "Logistic Regression",
+      "accuracy": 0.596,
+      "precision": 0.431,
+      "recall": 0.433,
+      "f1": 0.425,
+      "roc_auc": 0.586,
+      "pr_auc": 0.429,
+      "F1 std": 0.047,
+      "Seconds": 31.478
+    },
+    {
+      "Model": "Linear SVM (calibrated)",
+      "accuracy": 0.647,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.535,
+      "pr_auc": 0.395,
+      "F1 std": 0.0,
+      "Seconds": 31.641
+    },
+    {
+      "Model": "Random Forest",
+      "accuracy": 0.651,
+      "precision": 0.532,
+      "recall": 0.076,
+      "f1": 0.13,
+      "roc_auc": 0.576,
+      "pr_auc": 0.425,
+      "F1 std": 0.051,
+      "Seconds": 48.462
+    },
+    {
+      "Model": "XGBoost",
+      "accuracy": 0.598,
+      "precision": 0.42,
+      "recall": 0.349,
+      "f1": 0.375,
+      "roc_auc": 0.562,
+      "pr_auc": 0.414,
+      "F1 std": 0.04,
+      "Seconds": 182.009
+    }
+  ],
+  "test_metrics": {
+    "test_size": 1458,
+    "accuracy": 0.441,
+    "precision": 0.392,
+    "recall": 0.899,
+    "f1": 0.546,
+    "roc_auc": 0.553,
+    "pr_auc": 0.417,
+    "false_positive_rate": 0.833,
+    "baseline_accuracy": 0.626,
+    "baseline_pr_auc": 0.374
+  },
+  "sklearn_version": "1.6.1",
+  "created": "2026-10-15",
+  "limitations": [
+    "Scores whole methods; cannot point to the exact unsafe line.",
+    "Score is a resemblance to vulnerable training examples, not a probability of exploitability.",
+    "Trained on CVE-fix commits whose labels contain noise.",
+    "Python only."
+  ]
+}

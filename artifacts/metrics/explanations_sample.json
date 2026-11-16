@@ -1,0 +1,506 @@
+[
+  {
+    "source":"fixture",
+    "file":"eval_input.py",
+    "rule":"B307",
+    "category":"Code injection",
+    "mode":"llm",
+    "seconds":46.7,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The eval function is used to execute user-supplied input as Python code, which can lead to code injection vulnerabilities.",
+    "why_dangerous":"An attacker could abuse this by providing a malicious input that, when executed, could potentially execute arbitrary system commands or access sensitive data.",
+    "exploit_conditions":"The input must be untrusted and reach the eval function to be exploitable.",
+    "fix_explanation":"Using ast.literal_eval instead of eval helps prevent code injection vulnerabilities by only evaluating a limited subset of Python literals.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B307: eval",
+      "S2: CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "S3: OWASP Injection Prevention Cheat Sheet",
+      "S4: CWE-94: Improper Control of Generation of Code ('Code Injection')"
+    ],
+    "diff":"--- a\/eval_input.py\n+++ b\/eval_input.py\n@@ -1,4 +1,5 @@\n # expect: B307@3\n+import ast\n user_input = input(\"Enter expression: \")\n-result = eval(user_input)\n+result = ast.literal_eval(user_input)\n print(result)\n"
+  },
+  {
+    "source":"fixture",
+    "file":"exec_code.py",
+    "rule":"B102",
+    "category":"Code injection",
+    "mode":"llm",
+    "seconds":28.1,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"requires_review",
+    "summary":"The function `run_plugin` uses `exec` to execute arbitrary Python code, potentially allowing an attacker to inject malicious code and execute it with elevated privileges.",
+    "why_dangerous":"An attacker could abuse this by injecting malicious Python code that accesses restricted data, bypasses authentication, gains privileges, or executes unauthorized commands.",
+    "exploit_conditions":"Untrusted input reaching the `run_plugin` function, specifically the `code` parameter.",
+    "fix_explanation":"Using `ast` to parse and compile the code instead of `exec` ensures that the code is safely evaluated without allowing arbitrary execution.",
+    "citations":[
+      "S1",
+      "S2",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B102: exec_used",
+      "S2: CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "S3: OWASP Injection Prevention Cheat Sheet",
+      "S4: CWE-426: Untrusted Search Path"
+    ],
+    "diff":"--- a\/exec_code.py\n+++ b\/exec_code.py\n@@ -1,4 +1,10 @@\n # expect: B102@4\n def run_plugin(code: str) -> None:\n     namespace = {}\n-    exec(code, namespace)\n+    # Use ast to safely evaluate the code instead of exec\n+    import ast\n+    try:\n+        tree = ast.parse(code)\n+        exec(compile(tree, filename='', mode='exec'), namespace)\n+    except Exception as e:\n+        print(f'Error: {e}')\n"
+  },
+  {
+    "source":"fixture",
+    "file":"hardcoded_password.py",
+    "rule":"B105",
+    "category":"Hardcoded secret",
+    "mode":"llm",
+    "seconds":25.6,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The password variable is hardcoded with a string literal 'SuperSecret123', making it vulnerable to password guessing attacks.",
+    "why_dangerous":"An attacker could abuse this by guessing the password 'SuperSecret123' to gain unauthorized access to the system.",
+    "exploit_conditions":"The password variable must be assigned a value that looks like a password (e.g., 'password', 'pass', 'passwd', etc.) and is used in a way that makes it accessible to an attacker.",
+    "fix_explanation":"Using a secure source to retrieve the password, such as an environment variable or a secure storage mechanism, makes it harder for attackers to guess the password.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B105: hardcoded_password_string",
+      "S2: CWE-259: Use of Hard-coded Password",
+      "S3: OWASP Password Storage Cheat Sheet",
+      "S4: OWASP Secrets Management Cheat Sheet"
+    ],
+    "diff":"--- a\/hardcoded_password.py\n+++ b\/hardcoded_password.py\n@@ -1,5 +1,6 @@\n # expect: B105@2\n-password = \"SuperSecret123\"\n+import os\n+password = os.environ[\"PASSWORD\"]\n \n \n def connect(db):\n"
+  },
+  {
+    "source":"fixture",
+    "file":"md5_hash.py",
+    "rule":"B324",
+    "category":"Weak cryptography",
+    "mode":"llm",
+    "seconds":25.3,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The code uses MD5 hash, which is considered weak and insecure for security purposes.",
+    "why_dangerous":"An attacker could abuse this by using MD5 to store or transmit sensitive data, allowing them to potentially determine the original input, find another input with the same hash, or find multiple inputs with the same hash, leading to security breaches.",
+    "exploit_conditions":"The code must be used for storing or transmitting sensitive data without proper encryption or hashing.",
+    "fix_explanation":"Using SHA-256 instead of MD5 provides a stronger and more secure hashing algorithm, reducing the risk of security breaches.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B324: hashlib_insecure_functions",
+      "S2: CWE-327: Use of a Broken or Risky Cryptographic Algorithm",
+      "S3: OWASP Transport Layer Security Cheat Sheet",
+      "S4: CWE-328: Use of Weak Hash"
+    ],
+    "diff":"--- a\/md5_hash.py\n+++ b\/md5_hash.py\n@@ -3,4 +3,4 @@\n \n \n def hash_password(password: str) -> str:\n-    return hashlib.md5(password.encode()).hexdigest()\n+    return hashlib.sha256(password.encode()).hexdigest()\n"
+  },
+  {
+    "source":"fixture",
+    "file":"mktemp_file.py",
+    "rule":"B306",
+    "category":"Insecure temporary file",
+    "mode":"llm",
+    "seconds":19.6,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"requires_review",
+    "summary":"The function uses the deprecated and insecure mktemp function, which can create temporary files with insecure permissions.",
+    "why_dangerous":"An attacker could abuse this by manipulating the temporary file name to create a file with predictable permissions, potentially leading to unauthorized access to sensitive data.",
+    "exploit_conditions":"The exploit condition is met when an attacker can manipulate the temporary file name, which is possible if the function is called with untrusted input.",
+    "fix_explanation":"The corrected code uses the tempfile module's mktemp function with a prefix and suffix to create a temporary file with secure permissions.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: CWE-377: Insecure Temporary File",
+      "S2: Bandit B306: mktemp_q",
+      "S3: CWE-378: Creation of Temporary File With Insecure Permissions",
+      "S4: CWE-379: Creation of Temporary File in Directory with Insecure Permissions"
+    ],
+    "diff":"--- a\/mktemp_file.py\n+++ b\/mktemp_file.py\n@@ -2,5 +2,6 @@\n import tempfile\n \n \n+import tempfile\n def scratch_path() -> str:\n-    return tempfile.mktemp()\n+    return tempfile.mktemp(prefix='tmp_', suffix='.tmp')\n"
+  },
+  {
+    "source":"fixture",
+    "file":"os_system.py",
+    "rule":"B605",
+    "category":"Command injection",
+    "mode":"llm",
+    "seconds":28.3,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"passed_configured_checks",
+    "summary":"The os.system function is used to execute a system command, which makes the code vulnerable to shell injection attacks.",
+    "why_dangerous":"An attacker could execute unauthorized operating system commands, which could then be used to disable the product, or read and modify data for which the attacker does not have permissions to access directly.",
+    "exploit_conditions":"The code is vulnerable if the 'path' parameter passed to the 'remove' function contains malicious commands that are executed by the 'os.system' function.",
+    "fix_explanation":"The fix uses the subprocess.run function, which is safer than os.system because it separates the executable and arguments, preventing shell injection attacks.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+      "S2: OWASP OS Command Injection Defense Cheat Sheet",
+      "S3: Bandit B605: start_process_with_a_shell",
+      "S4: OWASP Injection Prevention Cheat Sheet"
+    ],
+    "diff":"--- a\/os_system.py\n+++ b\/os_system.py\n@@ -3,4 +3,5 @@\n \n \n def remove(path: str) -> None:\n-    os.system(\"rm -rf \" + path)\n+    import subprocess\n+    subprocess.run(['rm', '-rf', path], check=True)\n"
+  },
+  {
+    "source":"fixture",
+    "file":"pickle_loads.py",
+    "rule":"B301",
+    "category":"Unsafe deserialization",
+    "mode":"llm",
+    "seconds":28.2,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"requires_review",
+    "summary":"The function `load_session` uses `pickle.loads` to deserialize untrusted data, which can execute arbitrary code, making it vulnerable to a security issue.",
+    "why_dangerous":"An attacker could abuse this by sending a maliciously crafted byte array to the `load_session` function, potentially leading to code execution or other security issues.",
+    "exploit_conditions":"The function must be called with untrusted input (i.e., a byte array that has not been validated or sanitized) to be exploitable.",
+    "fix_explanation":"The fix uses the `encoding='latin1'` parameter to prevent the execution of arbitrary code. However, this fix does not address the underlying issue of deserializing untrusted data, and other security risks may still remain.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B301: pickle",
+      "S2: OWASP Deserialization Cheat Sheet",
+      "S3: CWE-502: Deserialization of Untrusted Data",
+      "S4: CWE-499: Serializable Class Containing Sensitive Data"
+    ],
+    "diff":"--- a\/pickle_loads.py\n+++ b\/pickle_loads.py\n@@ -2,5 +2,4 @@\n import pickle\n \n \n-def load_session(blob: bytes):\n-    return pickle.loads(blob)\n+def load_session(blob: bytes) -> object: return pickle.loads(blob, encoding='latin1')\n"
+  },
+  {
+    "source":"fixture",
+    "file":"random_token.py",
+    "rule":"B311",
+    "category":"Weak randomness",
+    "mode":"llm",
+    "seconds":25.8,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"passed_configured_checks",
+    "summary":"The function `reset_token` uses a standard pseudo-random generator to generate a token, which is not suitable for security\/cryptographic purposes.",
+    "why_dangerous":"An attacker could guess or predict the token, potentially leading to unauthorized access or other security breaches.",
+    "exploit_conditions":"The token must be used in a security-sensitive context, such as generating encryption keys or session IDs, and must be predictable by an attacker.",
+    "fix_explanation":"Using the `secrets` module generates a cryptographically secure pseudo-random number, which is suitable for security-sensitive functionality.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: CWE-330: Use of Insufficiently Random Values",
+      "S2: Bandit B311: random",
+      "S3: OWASP Cryptographic Storage Cheat Sheet",
+      "S4: CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG)"
+    ],
+    "diff":"--- a\/random_token.py\n+++ b\/random_token.py\n@@ -2,5 +2,6 @@\n import random\n \n \n+import secrets\n def reset_token() -> str:\n-    return str(random.randint(100000, 999999))\n+    return secrets.token_urlsafe(16)\n"
+  },
+  {
+    "source":"fixture",
+    "file":"requests_noverify.py",
+    "rule":"B501",
+    "category":"TLS \/ certificate validation",
+    "mode":"llm",
+    "seconds":24.3,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"Disabling certificate validation in HTTPS requests can allow man-in-the-middle attacks, where an attacker can intercept and modify the communication.",
+    "why_dangerous":"An attacker could intercept the communication, modify the data being sent, and impersonate the intended recipient, potentially leading to sensitive information being exposed or malicious activity being performed.",
+    "exploit_conditions":"The request must be made over an untrusted network or to an untrusted server, and the server must not be configured to validate the certificate.",
+    "fix_explanation":"Enabling certificate validation ensures that the communication is secure and that the server's identity is verified, preventing man-in-the-middle attacks.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: CWE-295: Improper Certificate Validation",
+      "S2: Bandit B501: request_with_no_cert_validation",
+      "S3: OWASP Transport Layer Security Cheat Sheet",
+      "S4: CWE-297: Improper Validation of Certificate with Host Mismatch"
+    ],
+    "diff":"--- a\/requests_noverify.py\n+++ b\/requests_noverify.py\n@@ -3,4 +3,4 @@\n \n \n def fetch(url: str) -> str:\n-    return requests.get(url, verify=False, timeout=10).text\n+    return requests.get(url, verify=True, timeout=10).text\n"
+  },
+  {
+    "source":"fixture",
+    "file":"shell_true.py",
+    "rule":"B602",
+    "category":"Command injection",
+    "mode":"llm",
+    "seconds":28.3,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"Using subprocess.check_output with shell=True can lead to command injection vulnerabilities, allowing an attacker to execute arbitrary commands or programs.",
+    "why_dangerous":"An attacker could abuse this by providing a malicious input to the 'host' parameter, which would be executed as a shell command, potentially leading to unauthorized access or data tampering.",
+    "exploit_conditions":"The subprocess call must be untrusted and the 'host' parameter must be user-inputted.",
+    "fix_explanation":"Using a list of arguments instead of a single string with shell=True prevents shell injection attacks by ensuring the command is executed with separate arguments, rather than as a single shell command.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B602: subprocess_popen_with_shell_equals_true",
+      "S2: CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+      "S3: OWASP OS Command Injection Defense Cheat Sheet",
+      "S4: OWASP Injection Prevention Cheat Sheet"
+    ],
+    "diff":"--- a\/shell_true.py\n+++ b\/shell_true.py\n@@ -1,6 +1,7 @@\n # expect: B602@6\n import subprocess\n+import shlex\n \n \n def ping(host: str) -> bytes:\n-    return subprocess.check_output(\"ping -c 1 \" + host, shell=True)\n+    return subprocess.check_output(shlex.split(\"ping -c 1 \" + host), shell=False)\n"
+  },
+  {
+    "source":"fixture",
+    "file":"sql_format.py",
+    "rule":"B608",
+    "category":"SQL injection",
+    "mode":"llm",
+    "seconds":26.1,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"requires_review",
+    "summary":"The function `get_user` constructs an SQL query using user-supplied input without proper sanitization, making it vulnerable to SQL injection attacks.",
+    "why_dangerous":"An attacker could abuse this vulnerability by injecting malicious SQL code, potentially allowing them to access or modify sensitive data, or even execute system commands.",
+    "exploit_conditions":"The vulnerability is exploitable if the `username` parameter is untrusted and reaches the `execute` method of the `cursor` object.",
+    "fix_explanation":"The corrected code uses a parameterized query, which prevents SQL injection attacks by separating the SQL code from the user input. This ensures that the input is treated as data, not as part of the SQL query.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+      "S2: Bandit B608: hardcoded_sql_expressions",
+      "S3: OWASP SQL Injection Prevention Cheat Sheet",
+      "S4: OWASP Query Parameterization Cheat Sheet"
+    ],
+    "diff":""
+  },
+  {
+    "source":"fixture",
+    "file":"yaml_load.py",
+    "rule":"B506",
+    "category":"Unsafe deserialization",
+    "mode":"llm",
+    "seconds":28.0,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The `yaml.load()` function is used to deserialize YAML data, allowing instantiation of arbitrary objects from untrusted sources, which can lead to code injection and execution of malicious commands.",
+    "why_dangerous":"An attacker could abuse this by sending a malicious YAML document that, when deserialized, would execute arbitrary code, potentially leading to code injection or other security vulnerabilities.",
+    "exploit_conditions":"The vulnerability is exploitable if the `read_config` function receives untrusted YAML data as input.",
+    "fix_explanation":"Using `yaml.safe_load()` instead of `yaml.load()` limits the ability to construct arbitrary Python objects, making the code safer and reducing the risk of code injection.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B506: yaml_load",
+      "S2: OWASP Deserialization Cheat Sheet",
+      "S3: CWE-502: Deserialization of Untrusted Data",
+      "S4: CWE-499: Serializable Class Containing Sensitive Data"
+    ],
+    "diff":"--- a\/yaml_load.py\n+++ b\/yaml_load.py\n@@ -3,4 +3,4 @@\n \n \n def read_config(text: str):\n-    return yaml.load(text, Loader=yaml.Loader)\n+    return yaml.safe_load(text)\n"
+  },
+  {
+    "source":"cvefixes",
+    "file":"m0038.py",
+    "rule":"B202",
+    "category":"Other security issue",
+    "mode":"llm",
+    "seconds":19.4,
+    "valid_json":true,
+    "grounded":false,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"requires_review",
+    "summary":"The `tarfile.extractall` function is used without any validation, allowing potentially dangerous members to be extracted, which could lead to path traversal attacks or other security issues.",
+    "why_dangerous":"An attacker could abuse this by providing a malicious tarball with directory traversal sequences, such as `..\/` or `\\",
+    "exploit_conditions":"",
+    "fix_explanation":"",
+    "citations":[
+
+    ],
+    "sources":[
+      "S1: Bandit B202: tarfile_unsafe_members",
+      "S2: OWASP File Upload Cheat Sheet",
+      "S3: CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+      "S4: CWE-377: Insecure Temporary File"
+    ],
+    "diff":""
+  },
+  {
+    "source":"cvefixes",
+    "file":"m0083.py",
+    "rule":"B605",
+    "category":"Command injection",
+    "mode":"llm",
+    "seconds":50.9,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"requires_review",
+    "summary":"The function `capture_dependencies` starts a process using `os.system` with a command that includes untrusted input, making it vulnerable to command injection attacks.",
+    "why_dangerous":"An attacker could execute unauthorized operating system commands, potentially disabling the product or reading and modifying data for which they do not have permissions.",
+    "exploit_conditions":"The function must be called with an untrusted input for the `requirements_path` parameter, and the input must be used directly in the command without any validation or sanitization.",
+    "fix_explanation":"The fix uses `subprocess.run` instead of `os.system` to avoid shell injection and ensure that the command is executed safely.",
+    "citations":[
+      "S1",
+      "S3"
+    ],
+    "sources":[
+      "S1: CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+      "S2: OWASP OS Command Injection Defense Cheat Sheet",
+      "S3: Bandit B605: start_process_with_a_shell",
+      "S4: OWASP Injection Prevention Cheat Sheet"
+    ],
+    "diff":""
+  },
+  {
+    "source":"cvefixes",
+    "file":"m0113.py",
+    "rule":"B307",
+    "category":"Code injection",
+    "mode":"llm",
+    "seconds":33.8,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The code uses eval with untrusted input, which can lead to code injection attacks, allowing an attacker to execute arbitrary system commands.",
+    "why_dangerous":"An attacker could abuse this by providing a malicious input that, when evaluated, executes a system command, potentially allowing them to access or modify sensitive data or system resources.",
+    "exploit_conditions":"The code uses eval with untrusted input, which must reach the eval function to be exploitable.",
+    "fix_explanation":"Using ast.literal_eval instead of eval provides a safer way to evaluate the input, as it is designed to avoid executing code and is more resistant to attacks.",
+    "citations":[
+      "S2",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B307: eval",
+      "S2: CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "S3: OWASP Injection Prevention Cheat Sheet",
+      "S4: CWE-94: Improper Control of Generation of Code ('Code Injection')"
+    ],
+    "diff":"--- a\/m0113.py\n+++ b\/m0113.py\n@@ -1,3 +1,4 @@\n+import ast\n def calc(self, irc, msg, args, text):\n     \"\"\"<math expression>\n \n@@ -49,7 +50,7 @@\n     text = self._mathRe.sub(handleMatch, text)\n     try:\n         self.log.info('evaluating %q from %s', text, msg.prefix)\n-        x = complex(eval(text, self._mathSafeEnv, self._mathSafeEnv))\n+        x = complex(ast.literal_eval(text, self._mathSafeEnv, self._mathSafeEnv))\n         irc.reply(self._complexToString(x))\n     except OverflowError:\n         maxFloat = math.ldexp(0.9999999999999999, 1024)\n"
+  },
+  {
+    "source":"cvefixes",
+    "file":"m0114.py",
+    "rule":"B307",
+    "category":"Code injection",
+    "mode":"llm",
+    "seconds":28.9,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The code uses eval() to execute user-supplied input, which can lead to code injection attacks.",
+    "why_dangerous":"An attacker could abuse this by injecting malicious code, potentially allowing them to execute arbitrary system commands or access sensitive data.",
+    "exploit_conditions":"The code will be vulnerable if the input is not properly sanitized and is executed by the eval() function.",
+    "fix_explanation":"Using ast.literal_eval() instead of eval() helps prevent code injection attacks by only evaluating literals and avoiding the execution of arbitrary code.",
+    "citations":[
+      "S2",
+      "S3"
+    ],
+    "sources":[
+      "S1: Bandit B307: eval",
+      "S2: CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "S3: OWASP Injection Prevention Cheat Sheet",
+      "S4: CWE-94: Improper Control of Generation of Code ('Code Injection')"
+    ],
+    "diff":"--- a\/m0114.py\n+++ b\/m0114.py\n@@ -1,3 +1,4 @@\n+import ast\n def icalc(self, irc, msg, args, text):\n     \"\"\"<math expression>\n \n@@ -21,7 +22,7 @@\n     text = text.replace('lambda', '')\n     try:\n         self.log.info('evaluating %q from %s', text, msg.prefix)\n-        irc.reply(str(eval(text, self._mathEnv, self._mathEnv)))\n+        irc.reply(str(ast.literal_eval(text, self._mathEnv, self._mathEnv)))\n     except OverflowError:\n         maxFloat = math.ldexp(0.9999999999999999, 1024)\n         irc.error(_('The answer exceeded %s or so.') % maxFloat)\n"
+  },
+  {
+    "source":"cvefixes",
+    "file":"m0117.py",
+    "rule":"B307",
+    "category":"Code injection",
+    "mode":"llm",
+    "seconds":35.2,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"rule_template",
+    "fix_status":"passed_configured_checks",
+    "summary":"The code uses eval with untrusted input, which can lead to code injection vulnerabilities.",
+    "why_dangerous":"An attacker could abuse this by injecting malicious code, potentially leading to arbitrary code execution or other security issues.",
+    "exploit_conditions":"The code uses eval with untrusted input, which must reach the eval call to be exploitable.",
+    "fix_explanation":"Using ast.literal_eval instead of eval can help prevent code injection vulnerabilities, but it may not prevent excessive memory or stack consumption with deeply nested structures.",
+    "citations":[
+      "S1",
+      "S2"
+    ],
+    "sources":[
+      "S1: Bandit B307: eval",
+      "S2: CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')",
+      "S3: OWASP Injection Prevention Cheat Sheet",
+      "S4: CWE-94: Improper Control of Generation of Code ('Code Injection')"
+    ],
+    "diff":"--- a\/m0117.py\n+++ b\/m0117.py\n@@ -1,3 +1,4 @@\n+import ast\n def rpn(self, irc, msg, args):\n     \"\"\"<rpn math expression>\n \n@@ -35,7 +36,7 @@\n                 arg1 = stack.pop()\n                 s = '%s%s%s' % (arg1, arg, arg2)\n                 try:\n-                    stack.append(eval(s, self._mathSafeEnv, self._mathSafeEnv))\n+                    stack.append(ast.literal_eval(s, self._mathSafeEnv, self._mathSafeEnv))\n                 except SyntaxError:\n                     irc.error(format(_('%q is not a defined function.'),\n                                      arg))\n"
+  },
+  {
+    "source":"cvefixes",
+    "file":"m0122.py",
+    "rule":"B301",
+    "category":"Unsafe deserialization",
+    "mode":"llm",
+    "seconds":29.6,
+    "valid_json":true,
+    "grounded":true,
+    "on_topic":true,
+    "fix_origin":"llm",
+    "fix_status":"passed_configured_checks",
+    "summary":"The code uses pickle to deserialize untrusted data, which can execute arbitrary code, making it vulnerable to CWE-502: Deserialization of Untrusted Data.",
+    "why_dangerous":"An attacker could abuse this by sending a maliciously crafted configuration file to overwrite sensitive data or execute arbitrary code on the server.",
+    "exploit_conditions":"The vulnerability is exploitable if the attacker can manipulate the 'name' parameter in the request to point to a malicious configuration file.",
+    "fix_explanation":"The fix removes the use of pickle.load() and instead checks if the configuration file exists before loading it. This prevents the execution of arbitrary code and reduces the risk of CWE-502.",
+    "citations":[
+      "S3",
+      "S1"
+    ],
+    "sources":[
+      "S1: Bandit B301: pickle",
+      "S2: OWASP Deserialization Cheat Sheet",
+      "S3: CWE-502: Deserialization of Untrusted Data",
+      "S4: CWE-499: Serializable Class Containing Sensitive Data"
+    ],
+    "diff":"--- a\/m0122.py\n+++ b\/m0122.py\n@@ -9,9 +9,7 @@\n             config_pkl = os.path.join(\n                 app.config['CONFIG_PATH'],\n                 request.args.get('name'))\n-            session['config'] = (pickle.load(open(config_pkl, 'rb'))\n-                                 if os.path.exists(config_pkl)\n-                                 else session['config'])\n+            session['config'] = config_data if os.path.exists(config_pkl) else session['config']\n             return json.dumps(session['config'])\n         else:\n             return json.dumps({})\n"
+  }
+]

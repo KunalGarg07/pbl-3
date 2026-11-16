@@ -1,0 +1,178 @@
+{
+  "fixtures": [
+    {
+      "engine": "bandit",
+      "TP": 12.0,
+      "FP": 1.0,
+      "FN": 0.0,
+      "TN": 10.0,
+      "precision": 0.923,
+      "recall": 1.0,
+      "false_positive_rate": 0.091,
+      "f1": 0.96
+    },
+    {
+      "engine": "ml",
+      "TP": 8.0,
+      "FP": 2.0,
+      "FN": 4.0,
+      "TN": 9.0,
+      "precision": 0.8,
+      "recall": 0.667,
+      "false_positive_rate": 0.182,
+      "f1": 0.727
+    },
+    {
+      "engine": "combined",
+      "TP": 12.0,
+      "FP": 3.0,
+      "FN": 0.0,
+      "TN": 8.0,
+      "precision": 0.8,
+      "recall": 1.0,
+      "false_positive_rate": 0.273,
+      "f1": 0.889
+    }
+  ],
+  "cvefixes_test": {
+    "methods": 726,
+    "pairs": 363,
+    "engines": [
+      {
+        "engine": "Bandit (all rules)",
+        "TP": 71.0,
+        "FP": 66.0,
+        "FN": 292.0,
+        "TN": 297.0,
+        "precision": 0.518,
+        "recall": 0.196,
+        "false_positive_rate": 0.182,
+        "f1": 0.284
+      },
+      {
+        "engine": "Bandit (Medium+)",
+        "TP": 43.0,
+        "FP": 19.0,
+        "FN": 320.0,
+        "TN": 344.0,
+        "precision": 0.694,
+        "recall": 0.118,
+        "false_positive_rate": 0.052,
+        "f1": 0.202
+      },
+      {
+        "engine": "ML v2",
+        "TP": 37.0,
+        "FP": 29.0,
+        "FN": 326.0,
+        "TN": 334.0,
+        "precision": 0.561,
+        "recall": 0.102,
+        "false_positive_rate": 0.08,
+        "f1": 0.172
+      },
+      {
+        "engine": "Combined: Bandit Medium+ OR ML",
+        "TP": 70.0,
+        "FP": 47.0,
+        "FN": 293.0,
+        "TN": 316.0,
+        "precision": 0.598,
+        "recall": 0.193,
+        "false_positive_rate": 0.129,
+        "f1": 0.292
+      },
+      {
+        "engine": "Combined: Bandit AND ML",
+        "TP": 12.0,
+        "FP": 3.0,
+        "FN": 351.0,
+        "TN": 360.0,
+        "precision": 0.8,
+        "recall": 0.033,
+        "false_positive_rate": 0.008,
+        "f1": 0.063
+      }
+    ],
+    "pairs_outcomes": [
+      {
+        "engine": "Bandit (all rules)",
+        "flags vulnerable only (correct)": 10,
+        "flags both": 61,
+        "flags fixed only (wrong)": 5,
+        "flags neither": 287
+      },
+      {
+        "engine": "Bandit (Medium+)",
+        "flags vulnerable only (correct)": 28,
+        "flags both": 15,
+        "flags fixed only (wrong)": 4,
+        "flags neither": 316
+      },
+      {
+        "engine": "ML v2",
+        "flags vulnerable only (correct)": 15,
+        "flags both": 22,
+        "flags fixed only (wrong)": 7,
+        "flags neither": 319
+      },
+      {
+        "engine": "Combined: Bandit Medium+ OR ML",
+        "flags vulnerable only (correct)": 33,
+        "flags both": 37,
+        "flags fixed only (wrong)": 10,
+        "flags neither": 283
+      },
+      {
+        "engine": "Combined: Bandit AND ML",
+        "flags vulnerable only (correct)": 9,
+        "flags both": 3,
+        "flags fixed only (wrong)": 0,
+        "flags neither": 351
+      }
+    ],
+    "bandit_rules_fired": {
+      "B101": 63,
+      "B202": 2,
+      "B311": 6,
+      "B701": 2,
+      "B603": 28,
+      "B605": 4,
+      "B607": 4,
+      "B307": 272,
+      "B301": 2,
+      "B102": 183,
+      "B110": 80,
+      "B112": 4,
+      "B608": 162,
+      "B104": 2,
+      "B602": 20,
+      "B113": 2,
+      "B108": 3,
+      "B105": 2,
+      "B604": 3
+    }
+  },
+  "explanations": {
+    "cases": 18,
+    "valid JSON (LLM answered)": 1.0,
+    "grounded": 0.9444444444444444,
+    "on topic": 1.0,
+    "fix proposed": 1.0,
+    "fix passed checks": 0.6666666666666666,
+    "template fixes passed": 1.0,
+    "LLM fixes passed": 0.3333333333333333,
+    "median seconds per explanation": 28.15
+  },
+  "speed": {
+    "single-file scans": 25,
+    "median single-file scan (ms)": 289,
+    "inputs rejected with a clear error": 7,
+    "crashes / engine failures": 0,
+    "repository scan: files": 23,
+    "repository scan (ms)": 443
+  },
+  "ml_model": "py-tfidf-logistic-v2-20261015",
+  "llm": "ollama:llama3.2",
+  "environment": "Python 3.13.5, Windows 11, CPU only"
+}
